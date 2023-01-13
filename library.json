@@ -1,0 +1,22 @@
+{
+  "name": "PN532",
+  "version": "0.0.1",
+  "description": "NFC library using PN532 to read/write card and communicate with android",
+  "keywords": "nfc,pn532,card",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hiroya-W/PN532.git"
+  },
+  "authors": [
+    {
+      "name": "Hiroya Watanabe",
+      "email": "hyuyukun@gmail.com",
+      "url": "https://github.com/Hiroya-W",
+      "maintainer": true
+    }
+  ],
+  "license": "BSD-3-Clause",
+  "homepage": "https://github.com/Hiroya-W/PN532.git",
+  "frameworks": "arduino",
+  "platforms": "*"
+}
