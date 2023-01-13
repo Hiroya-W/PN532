@@ -1,7 +1,7 @@
 #if 0
 #include <SPI.h>
 #include <PN532/PN532/PN532_SPI.h>
-#include "PN532/PN532/PN532.h"
+#include <PN532/PN532/PN532.h>
 
   PN532_SPI pn532spi(SPI, 10);
   PN532 nfc(pn532spi);
@@ -13,8 +13,8 @@ PN532_HSU pn532hsu(Serial1);
 PN532 nfc(pn532hsu);
 #else
 #include <Wire.h>
-#include <PN532_I2C.h>
-#include <PN532.h>
+#include <PN532/PN532_I2C/PN532_I2C.h>
+#include <PN532/PN532/PN532.h>
 #endif
 
 void setup()

@@ -15,27 +15,27 @@
 
 #if 1
   #include <SPI.h>
-  #include <PN532_SPI.h>
-  #include <PN532.h>
+  #include <PN532/PN532_SPI/PN532_SPI.h>
+  #include <PN532/PN532/PN532.h>
 
 PN532_SPI pn532spi(SPI, 10);
 PN532 nfc(pn532spi);
 #elif 0
-  #include <PN532_HSU.h>
-  #include <PN532.h>
+  #include <PN532/PN532_HSU/PN532_HSU.h>
+  #include <PN532/PN532/PN532.h>
 
 PN532_HSU pn532hsu(Serial1);
 PN532 nfc(pn532hsu);
 #else
   #include <Wire.h>
-  #include <PN532_I2C.h>
-  #include <PN532.h>
+  #include <PN532/PN532_I2C/PN532_I2C.h>
+  #include <PN532/PN532/PN532.h>
 
 PN532_I2C pn532i2c(Wire);
 PN532 nfc(pn532i2c);
 #endif
 
-#include <PN532_debug.h>
+#include <PN532/PN532/PN532_debug.h>
 
 uint8_t        _prevIDm[8];
 unsigned long  _prevTime;
