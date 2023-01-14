@@ -42,13 +42,13 @@ void PN532::PrintHex(const uint8_t *data, const uint32_t numBytes)
 #ifdef ARDUINO
     for (uint8_t i = 0; i < numBytes; i++) {
         if (data[i] < 0x10) {
-            SERIAL.print(" 0");
+            PN532_SERIAL.print(" 0");
         } else {
-            SERIAL.print(' ');
+            PN532_SERIAL.print(' ');
         }
-        SERIAL.print(data[i], HEX);
+        PN532_SERIAL.print(data[i], HEX);
     }
-    SERIAL.println("");
+    PN532_SERIAL.println("");
 #else
     for (uint8_t i = 0; i < numBytes; i++) {
         printf(" %2X", data[i]);
@@ -73,22 +73,22 @@ void PN532::PrintHexChar(const uint8_t *data, const uint32_t numBytes)
 #ifdef ARDUINO
     for (uint8_t i = 0; i < numBytes; i++) {
         if (data[i] < 0x10) {
-            SERIAL.print(" 0");
+            PN532_SERIAL.print(" 0");
         } else {
-            SERIAL.print(' ');
+            PN532_SERIAL.print(' ');
         }
-        SERIAL.print(data[i], HEX);
+        PN532_SERIAL.print(data[i], HEX);
     }
-    SERIAL.print("    ");
+    PN532_SERIAL.print("    ");
     for (uint8_t i = 0; i < numBytes; i++) {
         char c = data[i];
         if (c <= 0x1f || c > 0x7f) {
-            SERIAL.print('.');
+            PN532_SERIAL.print('.');
         } else {
-            SERIAL.print(c);
+            PN532_SERIAL.print(c);
         }
     }
-    SERIAL.println("");
+    PN532_SERIAL.println("");
 #else
     for (uint8_t i = 0; i < numBytes; i++) {
         printf(" %2X", data[i]);
@@ -312,12 +312,12 @@ bool PN532::SAMConfig(void)
 
 /**************************************************************************/
 /*!
-    @brief  Turn the module into power mode  will wake up on I2C or SPI request 
+    @brief  Turn the module into power mode  will wake up on I2C or SPI request
 */
 /**************************************************************************/
 bool PN532::powerDownMode()
 {
-    pn532_packetbuffer[0] = PN532_COMMAND_POWERDOWN; 
+    pn532_packetbuffer[0] = PN532_COMMAND_POWERDOWN;
     pn532_packetbuffer[1] = 0xC0; // I2C or SPI Wakeup
     pn532_packetbuffer[2] = 0x00; // no IRQ
 
@@ -357,13 +357,13 @@ bool PN532::setPassiveActivationRetries(uint8_t maxRetries)
 /*!
     Sets the RFon/off uint8_t of the RFConfiguration register
 
-    @param  autoRFCA    0x00 No check of the external field before 
-                        activation 
-                        
-                        0x02 Check the external field before 
+    @param  autoRFCA    0x00 No check of the external field before
                         activation
 
-    @param  rFOnOff     0x00 Switch the RF field off, 0x01 switch the RF 
+                        0x02 Check the external field before
+                        activation
+
+    @param  rFOnOff     0x00 Switch the RF field off, 0x01 switch the RF
                         field on
 
     @returns    1 if everything executed properly, 0 for an error
@@ -374,7 +374,7 @@ bool PN532::setRFField(uint8_t autoRFCA, uint8_t rFOnOff)
 {
     pn532_packetbuffer[0] = PN532_COMMAND_RFCONFIGURATION;
     pn532_packetbuffer[1] = 1;
-    pn532_packetbuffer[2] = 0x00 | autoRFCA | rFOnOff;  
+    pn532_packetbuffer[2] = 0x00 | autoRFCA | rFOnOff;
 
     if (HAL(writeCommand)(pn532_packetbuffer, 3)) {
         return 0x0;  // command failed
@@ -635,9 +635,9 @@ uint8_t PN532::mifareclassic_WriteDataBlock (uint8_t blockNumber, uint8_t *data)
 
     /* Check status */
     if (pn532_packetbuffer[0] != 0x00) {
-    	DMSG("Status code indicates an error: ");
-    	DMSG_HEX(pn532_packetbuffer[0]);
-    	DMSG("\n");
+        DMSG("Status code indicates an error: ");
+        DMSG_HEX(pn532_packetbuffer[0]);
+        DMSG("\n");
         return 0;
     }
 
@@ -950,7 +950,7 @@ bool PN532::inListPassiveTarget()
 }
 
 int8_t PN532::tgInitAsTarget(const uint8_t* command, const uint8_t len, const uint16_t timeout){
-  
+
   int8_t status = HAL(writeCommand)(command, len);
     if (status < 0) {
         return -1;
