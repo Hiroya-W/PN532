@@ -1146,6 +1146,80 @@ int8_t PN532::felica_Polling(uint16_t systemCode, uint8_t requestCode, uint8_t *
   return 1;
 }
 
+int8_t PN532::felica_WaitingCard(uint16_t systemCode, uint8_t requestCode, uint8_t * idm, uint8_t * pmm, uint16_t *systemCodeResponse)
+{
+  pn532_packetbuffer[0] = PN532_COMMAND_INLISTPASSIVETARGET;
+  pn532_packetbuffer[1] = 1;
+  pn532_packetbuffer[2] = 1;
+  pn532_packetbuffer[3] = FELICA_CMD_POLLING;
+  pn532_packetbuffer[4] = (systemCode >> 8) & 0xFF;
+  pn532_packetbuffer[5] = systemCode & 0xFF;
+  pn532_packetbuffer[6] = requestCode;
+  pn532_packetbuffer[7] = 0;
+
+  if (HAL(writeCommand)(pn532_packetbuffer, 8)) {
+    DMSG("Could not send Polling command\n");
+    return -1;
+  }
+  return 1;
+}
+
+int8_t PN532::felica_ReadingCard(uint16_t systemCode, uint8_t requestCode, uint8_t * idm, uint8_t * pmm, uint16_t *systemCodeResponse, uint16_t timeout)
+{
+  pn532_packetbuffer[0] = PN532_COMMAND_INLISTPASSIVETARGET;
+  pn532_packetbuffer[1] = 1;
+  pn532_packetbuffer[2] = 1;
+  pn532_packetbuffer[3] = FELICA_CMD_POLLING;
+  pn532_packetbuffer[4] = (systemCode >> 8) & 0xFF;
+  pn532_packetbuffer[5] = systemCode & 0xFF;
+  pn532_packetbuffer[6] = requestCode;
+  pn532_packetbuffer[7] = 0;
+
+  int16_t status = HAL(readResponse)(pn532_packetbuffer, 22, timeout);
+  if (status < 0) {
+    DMSG("Could not receive response\n");
+    return -2;
+  }
+
+  // Check NbTg (pn532_packetbuffer[7])
+  if (pn532_packetbuffer[0] == 0) {
+    DMSG("No card had detected\n");
+    return 0;
+  } else if (pn532_packetbuffer[0] != 1) {
+    DMSG("Unhandled number of targets inlisted. NbTg: ");
+    DMSG_HEX(pn532_packetbuffer[7]);
+    DMSG("\n");
+    return -3;
+  }
+
+  inListedTag = pn532_packetbuffer[1];
+  DMSG("Tag number: ");
+  DMSG_HEX(pn532_packetbuffer[1]);
+  DMSG("\n");
+
+  // length check
+  uint8_t responseLength = pn532_packetbuffer[2];
+  if (responseLength != 18 && responseLength != 20) {
+    DMSG("Wrong response length\n");
+    return -4;
+  }
+
+  uint8_t i;
+  for (i=0; i<8; ++i) {
+    idm[i] = pn532_packetbuffer[4+i];
+    _felicaIDm[i] = pn532_packetbuffer[4+i];
+    pmm[i] = pn532_packetbuffer[12+i];
+    _felicaPMm[i] = pn532_packetbuffer[12+i];
+  }
+
+  if ( responseLength == 20 ) {
+    *systemCodeResponse = (uint16_t)((pn532_packetbuffer[20] << 8) + pn532_packetbuffer[21]);
+  }
+
+  return 1;
+}
+
+
 /**************************************************************************/
 /*!
     @brief  Sends FeliCa command to the currently inlisted peer
